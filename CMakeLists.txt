@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.0)
+project(glider_project)
+
+set(OS_BITS 32)
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(OS_BITS 64)
+endif()
+
+set(OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_NAME}${OS_BITS}/${CMAKE_BUILD_TYPE}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}/static")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+
+add_executable(${PROJECT_NAME} main.cpp)
