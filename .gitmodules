@@ -1,0 +1,6 @@
+[submodule "nanogui"]
+	path = nanogui
+	url = https://github.com/wjakob/nanogui.git
+[submodule "glm"]
+	path = glm
+	url = https://github.com/g-truc/glm.git
