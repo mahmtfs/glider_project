@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100" data-bs-theme="dark">
+    <head>
+        <title>Schedule Builder</title>
+        <link href="https://mahmtfs.github.io/css/custom.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://mahmtfs.github.io/js/theme_switch.js"></script>
+    </head>
+    <body class="d-flex flex-column h-100" onload="themeSetter()">
+        <div class="fixed-top" style="z-index: 1035; width: 50%;">
+            <a class="btn" href="https://mahmtfs.github.io/">&lt; Back to main page</a>
+        </div>
+        <div class="d-flex flex-row-reverse fixed-top">
+            <button id="dark_mode" class="btn border-dark rounded-0" onclick="themeSwitch()">
+                Dark Mode: <span id="dark_mode_status"></span>
+            </button>
+        </div>
+        <header class="container text-center mt-5pt">
+            <h1>Glider Project</h1>
+            <p>A 3D graphics application simulating a flying glider.</p>
+        </header>
+        <main class="container text-center">
+            <p class="title-text mt-2pt">Download:</p>
+            <p>Windows 10 x64: <a class="no-decoration" href="Glider Project.zip" download="Glider Project">Glider Project</a></p>  
+            <p class="title-text mt-2pt">Instructions:</p>
+            <p>Download and unzip the .zip file.<br> Open the Glider Project folder.
+            Open the glider_project app.</p>
+            <p class="title-text mt-2pt">Licence:</p>  
+            <p>Glider Project is free and open source. You can find the source code <a class="no-decoration" href="https://github.com/mahmtfs/glider_project">here</a>.</p>     
+            <p class="title-text mt-2pt">Description:</p>  
+            <p>Glider Project is a 3D simulation of a flying hang glider.<br> 
+            User can control the glider's movement.</p>
+            Screenshot:<br>
+            <img style="flex:content; height: 440px; width: 700px;" src="screenshot.png">
+        </main>
+        <footer class="footer mt-auto py-3">
+            <div class="container text-center">
+                <p class="formal-note">Powered by GitHub. Made with Bootstrap.</p>
+            </div>
+        </footer>
+    </body>
+</html>
