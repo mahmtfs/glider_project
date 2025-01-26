@@ -14,6 +14,11 @@
 #include <chrono>
 #include <cmath>
 
+#include <nanogui/screen.h>
+#include <nanogui/label.h>
+#include <nanogui/window.h>
+#include <nanogui/layout.h>
+
 bool cursor = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -21,6 +26,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void processInput(GLFWwindow *window);
 long long getCurrentTime();
 
+float iTurn = 0.0f;
 
 unsigned int SCR_WIDTH = 800;
 unsigned int SCR_HEIGHT = 600;
@@ -75,8 +81,6 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
 
-    //glfwSetWindowAspectRatio(window, SCR_WIDTH, SCR_HEIGHT);
-
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -85,11 +89,11 @@ int main()
         return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
-
     Shader shader("shaders/vert.glsl", "shaders/frag.glsl");
+    Shader cloudShader("shaders/cloudVert.glsl", "shaders/cloudFrag.glsl");
     
     unsigned int VBO, VAO;
+    unsigned int VBO2, VAO2;
     unsigned int texture1;
     glm::vec3 positions[10] = {
         glm::vec3( 10.0f,  10.0f,  10.0f),
@@ -102,6 +106,15 @@ int main()
         glm::vec3( 10.5f,  20.0f, -20.5f),
         glm::vec3( 10.5f,  10.2f, -10.5f),
         glm::vec3(-10.3f,  10.0f, -10.5f)
+    };
+
+    float cloudPlane[18] = {
+        -1.0f,  1.0f,  -1.0f, 
+        -1.0f, -1.0f,  -1.0f, 
+        1.0f, -1.0f,  -1.0f, 
+        -1.0f,  1.0f,  -1.0f,
+        1.0f, -1.0f,  -1.0f, 
+        1.0f,  1.0f,  -1.0f, 
     };
 
     glGenVertexArrays(1, &VAO);
@@ -140,11 +153,40 @@ int main()
     }
     stbi_image_free(data);
 
+    glGenVertexArrays(1, &VAO2);
+    glGenBuffers(1, &VBO2);
+    glBindVertexArray(VAO2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 18, cloudPlane, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(2);
+
     shader.use();
     shader.setInt("texture1", 0);
 
+    nanogui::init();
+    {
+
+    nanogui::Screen *screen = new nanogui::Screen();
+    screen->initialize(window, true);
+    screen->setSize(nanogui::Vector2i(800, 500));
+
+    nanogui::Window *windowNano = new nanogui::Window(screen, "Controls");
+    windowNano->setSize(nanogui::Vector2i(200, 100));
+    windowNano->setLayout(new nanogui::GroupLayout());
+
+    nanogui::Label *label = new nanogui::Label(windowNano, "", "sans-bold");
+    label->setCaption("A/D - turn left/right\n");
+    nanogui::Label *label2 = new nanogui::Label(windowNano, "", "sans-bold");
+    label2->setCaption("ESCAPE - toggle mouse\n");   
+    screen->setVisible(true);
+    
+
     while (!glfwWindowShouldClose(window))
     {
+        glEnable(GL_DEPTH_TEST);
         long long currentFrame = getCurrentTime();
         deltaTime = (currentFrame - lastFrame) / 1000.0f;
         lastFrame = currentFrame;
@@ -191,13 +233,39 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, vertices.size());
         }
 
+        cloudShader.use();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        cloudShader.setFloat("iTime", glfwGetTime());
+        
+        if (roll){
+            iTurn += roll * deltaTime;
+        }
+        cloudShader.setFloat("iTurn", iTurn);
+        cloudShader.setVec2("iResolution", glm::vec2(SCR_WIDTH, SCR_HEIGHT));
+
+        glBindVertexArray(VAO2);
+        glDrawArrays(GL_TRIANGLES, 0, 18);
+        glDisable(GL_BLEND);
+
+        windowNano->setPosition(nanogui::Vector2i(10, SCR_HEIGHT / screen->pixelRatio() - 110));
+        screen->drawContents();
+        screen->drawWidgets();
+        screen->performLayout();
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
+        
+    }
+
     }
     
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    
+    glDeleteVertexArrays(1, &VAO2);
+    glDeleteBuffers(1, &VBO2);
+    nanogui::shutdown();
     glfwTerminate();
     return 0;
 }
@@ -242,7 +310,6 @@ void processInput(GLFWwindow *window)
     }
 
     yaw = std::fmod(yaw, 2 * glm::pi<float>());
-    //std::cout << yaw << "\n";
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
